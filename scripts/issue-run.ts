@@ -113,26 +113,29 @@ const instructions = [
     ? "1. Triage: ensure the issue exists and acceptance criteria are explicit."
     : "1. Wait gate: if no concrete user request exists yet, do not start intake triage.",
   issueId
-    ? "2. Plan: post a plan comment to Linear before editing code."
+    ? "2. Branch alignment: fetch the issue's gitBranchName from Linear and switch/create that branch before editing code."
     : "2. Intake triage: once a concrete user request exists, inspect it and search for an existing relevant issue in Linear.",
   issueId
-    ? "3. Implement: make focused code changes against acceptance criteria."
+    ? "3. Plan: post a plan comment to Linear before editing code."
     : "3. Bind before coding: once implementation scope is clear, reuse an existing issue when possible; create one only if truly needed, then set run.json issueId before edits.",
   issueId
-    ? "4. Verify: run tests and collect concrete evidence."
-    : "4. Plan: post a plan comment to that issue before editing code.",
+    ? "4. Implement: make focused code changes against acceptance criteria."
+    : "4. Branch alignment: after binding, fetch the issue's gitBranchName from Linear and switch/create that branch before edits.",
   issueId
-    ? "5. Document: post progress + done comments with summary, tests, verification, and PR details."
-    : "5. Implement: make focused code changes against acceptance criteria.",
+    ? "5. Verify: run tests and collect concrete evidence."
+    : "5. Plan: post a plan comment to that issue before editing code.",
   issueId
     ? "6. Open or update a PR for the issue branch and capture the PR URL in run.json changes.pullRequestUrl."
     : "6. Verify: run tests and collect concrete evidence.",
   issueId
-    ? "7. Transition: mark issue done only after evidence is posted."
+    ? "7. Document: post progress + done comments with summary, tests, verification, and PR details."
     : "7. Document: post progress + done comments with summary, tests, verification.",
   issueId
+    ? "8. Transition: mark issue done only after evidence is posted."
+    : "",
+  issueId
     ? ""
-    : "8. Transition: mark issue done only after evidence is posted.",
+    : "9. Transition: mark issue done only after evidence is posted.",
   "",
   "Artifact requirements:",
   "- Keep run.json in this directory updated during the run.",
