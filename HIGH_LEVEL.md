@@ -24,7 +24,7 @@ Linear is handled through Codex MCP tools, and `run.json` is the deterministic l
   - triage/clarify acceptance criteria
   - post plan before code
   - post progress updates
-  - open/update PR and capture PR URL in `run.json`
+  - open/update PR, include `Fixes <ISSUE_ID>` in the PR body, capture PR URL in `run.json`, and ensure the issue has that PR URL linked
   - post done evidence with PR details
   - transition issue state
 

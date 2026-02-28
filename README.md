@@ -27,7 +27,7 @@ For each issue run, enforce a reproducible loop:
 2. Post plan comment before coding
 3. Implement changes
 4. Run tests and collect evidence
-5. Open/update a PR and record the PR URL in `run.json`
+5. Open/update a PR, include `Fixes <ISSUE_ID>` in the PR body, and ensure the issue has the PR URL linked (auto-linked or manually attached)
 6. Post progress + done comments in Linear (including PR details)
 7. Mark done only after evidence exists
 
