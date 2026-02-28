@@ -1,10 +1,6 @@
 node_modules/
 
 # Keep repository CLI scripts in /bin tracked.
-# Ignore compiled binary artifacts that are sometimes produced locally.
-*.exe
-*.dll
-*.so
-*.dylib
-*.o
-*.a
+bin/
+
+.DS_Store
