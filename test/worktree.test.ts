@@ -12,7 +12,7 @@ describe("worktree", () => {
     const second = resolveWorktreeSpec("BRI-32", "2026-02-28T12:00:00.000Z", 200);
     assert.deepEqual(first, second);
     assert.equal(first.key, "bri-32");
-    assert.equal(first.branch, "project-agent-bri-32");
+    assert.equal(first.branch, "bri-32");
   });
 
   test("resolveWorktreeSpec generates unique unscoped keys from time and pid", () => {
