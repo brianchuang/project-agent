@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
@@ -69,6 +69,66 @@ test("issue-run defaults artifacts root to cwd and preserves override precedence
     rmSync(cwd, { recursive: true, force: true });
   }
 });
+
+test("issue-run unscoped instructions include PR lifecycle requirements", () => {
+  const cwd = mkdtempSync(join(repoRoot, ".tmp-project-agent-unscoped-instructions-"));
+  try {
+    const run = spawnSync(process.execPath, ["--import", "tsx", scriptPath, "--no-codex"], {
+      cwd,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        PROJECT_AGENT_DISABLE_WORKTREE: "1"
+      }
+    });
+    assert.equal(run.status, 0, run.stderr || run.stdout);
+    const instructionsPath = extractOutputPath(run.stdout || "", "- Instructions: ");
+    const instructions = readFileSync(instructionsPath, "utf8");
+    assert.match(
+      instructions,
+      /8\. PR lifecycle: open or update a PR for the issue branch and record the PR URL in run\.json changes\.pullRequestUrl\./
+    );
+    assert.match(
+      instructions,
+      /9\. Document: post progress \+ done comments with summary, tests, verification, and PR details\./
+    );
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("issue-run issue-bound instructions include PR lifecycle requirements", () => {
+  const cwd = mkdtempSync(join(repoRoot, ".tmp-project-agent-issue-instructions-"));
+  try {
+    const run = spawnSync(process.execPath, ["--import", "tsx", scriptPath, "BRI-39", "--no-codex"], {
+      cwd,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        PROJECT_AGENT_DISABLE_WORKTREE: "1"
+      }
+    });
+    assert.equal(run.status, 0, run.stderr || run.stdout);
+    const instructionsPath = extractOutputPath(run.stdout || "", "- Instructions: ");
+    const instructions = readFileSync(instructionsPath, "utf8");
+    assert.match(
+      instructions,
+      /6\. PR lifecycle: open or update a PR for the issue branch and record the PR URL in run\.json changes\.pullRequestUrl\./
+    );
+    assert.match(
+      instructions,
+      /7\. Document: post progress \+ done comments with summary, tests, verification, and PR details\./
+    );
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+function extractOutputPath(output: string, prefix: string): string {
+  const line = output.split("\n").find((entry) => entry.startsWith(prefix));
+  assert.ok(line, `expected output line with prefix ${prefix}`);
+  return line!.slice(prefix.length).trim();
+}
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

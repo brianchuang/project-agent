@@ -24,7 +24,8 @@ Linear is handled through Codex MCP tools, and `run.json` is the deterministic l
   - triage/clarify acceptance criteria
   - post plan before code
   - post progress updates
-  - post done evidence
+  - open/update PR and capture PR URL in `run.json`
+  - post done evidence with PR details
   - transition issue state
 
 3. Closeout validation
@@ -38,6 +39,7 @@ Linear is handled through Codex MCP tools, and `run.json` is the deterministic l
 - linear plan/progress/done comments marked true in artifact
 - at least one passing test result
 - non-empty verification steps
+- non-empty `changes.pullRequestUrl`
 - summary and `endedAt`
 
 `status=blocked` requires:

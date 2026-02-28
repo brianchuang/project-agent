@@ -27,8 +27,9 @@ For each issue run, enforce a reproducible loop:
 2. Post plan comment before coding
 3. Implement changes
 4. Run tests and collect evidence
-5. Post progress + done comments in Linear
-6. Mark done only after evidence exists
+5. Open/update a PR and record the PR URL in `run.json`
+6. Post progress + done comments in Linear (including PR details)
+7. Mark done only after evidence exists
 
 Run-level evidence is stored in a global artifacts directory and validated locally.
 
