@@ -1,5 +1,6 @@
 node_modules/
 .project-agent-worktrees/
+.project-agent-artifacts/
 
 # Keep repository CLI scripts in /bin tracked.
 
