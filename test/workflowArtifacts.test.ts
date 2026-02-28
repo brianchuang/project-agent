@@ -25,6 +25,7 @@ describe("workflowArtifacts", () => {
     assert.ok(errors.some((e) => e.includes("doneCommentPosted")));
     assert.ok(errors.some((e) => e.includes("tests.results")));
     assert.ok(errors.some((e) => e.includes("verification")));
+    assert.ok(errors.some((e) => e.includes("pullRequestUrl")));
     assert.ok(errors.some((e) => e.includes("endedAt")));
   });
 
@@ -39,6 +40,7 @@ describe("workflowArtifacts", () => {
     artifact.tests.commands = ["npm test"];
     artifact.tests.results = [{ command: "npm test", exitCode: 0 }];
     artifact.verification = ["Open the updated flow and confirm behavior."];
+    artifact.changes.pullRequestUrl = "https://github.com/example/repo/pull/123";
 
     assert.deepEqual(validateRunArtifact(artifact), []);
   });

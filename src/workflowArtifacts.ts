@@ -19,6 +19,7 @@ export type RunArtifact = {
   changes: {
     filesTouched: string[];
     commitShas: string[];
+    pullRequestUrl: string;
   };
   tests: {
     commands: string[];
@@ -42,7 +43,8 @@ export function createInitialRunArtifact(issueId: string, nowIso = new Date().to
     },
     changes: {
       filesTouched: [],
-      commitShas: []
+      commitShas: [],
+      pullRequestUrl: ""
     },
     tests: {
       commands: [],
@@ -88,6 +90,9 @@ export function validateRunArtifact(artifact: RunArtifact): string[] {
     }
     if (artifact.verification.length === 0) {
       errors.push("status=done requires at least one manual verification step");
+    }
+    if (!artifact.changes.pullRequestUrl.trim()) {
+      errors.push("status=done requires changes.pullRequestUrl");
     }
     if (!artifact.endedAt?.trim()) {
       errors.push("status=done requires endedAt");
