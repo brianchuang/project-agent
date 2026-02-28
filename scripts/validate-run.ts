@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { validateRunArtifact, type RunArtifact } from "../src/workflowArtifacts";
+import { parseRunArtifact, validateRunArtifact } from "../src/workflowArtifacts";
 
 function usage(): never {
   console.error("Usage: npm run validate-run -- <path-to-run.json>");
@@ -20,7 +20,16 @@ try {
   process.exit(1);
 }
 
-const errors = validateRunArtifact(parsed as RunArtifact);
+const parsedArtifact = parseRunArtifact(parsed);
+if (parsedArtifact.errors.length > 0) {
+  console.error("Run artifact schema validation failed:");
+  for (const error of parsedArtifact.errors) {
+    console.error(`- ${error}`);
+  }
+  process.exit(1);
+}
+
+const errors = validateRunArtifact(parsedArtifact.artifact);
 if (errors.length > 0) {
   console.error("Run artifact validation failed:");
   for (const error of errors) {

@@ -56,6 +56,8 @@ project-agent
 
 In free-form mode, Codex must triage first, then bind the run to an existing or newly-created Linear issue by setting `run.json.issueId` before coding.
 
+`run.json` is versioned (`version` field) and `validate-run` enforces supported schema versions.
+
 By default this creates files under:
 
 - `~/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/run.json`
