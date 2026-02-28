@@ -116,6 +116,9 @@ export function validateRunArtifact(artifact: RunArtifact): string[] {
     if (!artifact.linear.doneCommentPosted) {
       errors.push("status=done requires linear.doneCommentPosted=true");
     }
+    if (!artifact.linear.stateTransitionedTo?.trim()) {
+      errors.push("status=done requires linear.stateTransitionedTo");
+    }
     if (!artifact.summary.trim()) {
       errors.push("status=done requires summary");
     }
