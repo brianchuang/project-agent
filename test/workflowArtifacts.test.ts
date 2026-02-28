@@ -1,12 +1,20 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { createInitialRunArtifact, validateRunArtifact } from "../src/workflowArtifacts";
+import { RUN_ARTIFACT_VERSION, createInitialRunArtifact, parseRunArtifact, validateRunArtifact } from "../src/workflowArtifacts";
 
 describe("workflowArtifacts", () => {
   test("initial artifact starts in progress and does not require done gates", () => {
     const artifact = createInitialRunArtifact("AG-1", "2026-02-28T00:00:00.000Z");
+    assert.equal(artifact.version, RUN_ARTIFACT_VERSION);
     assert.equal(artifact.status, "in_progress");
     assert.deepEqual(validateRunArtifact(artifact), []);
+  });
+
+  test("schema parser rejects unsupported version", () => {
+    const candidate = { ...createInitialRunArtifact("AG-1", "2026-02-28T00:00:00.000Z"), version: 2 };
+    const parsed = parseRunArtifact(candidate);
+    assert.equal(parsed.artifact, null);
+    assert.ok(parsed.errors.some((e) => e.includes("unsupported run artifact version")));
   });
 
   test("in-progress artifact can start without issueId for intake triage", () => {
