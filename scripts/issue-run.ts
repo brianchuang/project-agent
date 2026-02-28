@@ -106,7 +106,7 @@ const requiredSequence = issueId
       "3. Plan: post a plan comment to Linear before editing code.",
       "4. Implement: make focused code changes against acceptance criteria.",
       "5. Verify: run tests and collect concrete evidence.",
-      "6. PR lifecycle: open or update a PR for the issue branch and record the PR URL in run.json changes.pullRequestUrl.",
+      `6. PR lifecycle: open or update a PR for the issue branch, include \"Fixes ${issueId}\" in the PR body for Linear linking, and record the PR URL in run.json changes.pullRequestUrl.`,
       "7. Document: post progress + done comments with summary, tests, verification, and PR details.",
       "8. Transition: mark issue done only after evidence is posted."
     ]
@@ -118,7 +118,7 @@ const requiredSequence = issueId
       "5. Plan: post a plan comment to that issue before editing code.",
       "6. Implement: make focused code changes against acceptance criteria.",
       "7. Verify: run tests and collect concrete evidence.",
-      "8. PR lifecycle: open or update a PR for the issue branch and record the PR URL in run.json changes.pullRequestUrl.",
+      "8. PR lifecycle: open or update a PR for the issue branch, include \"Fixes <ISSUE_ID>\" in the PR body for Linear linking, and record the PR URL in run.json changes.pullRequestUrl.",
       "9. Document: post progress + done comments with summary, tests, verification, and PR details.",
       "10. Transition: mark issue done only after evidence is posted."
     ];
@@ -144,6 +144,7 @@ const instructions = [
   "- If run started without issueId, do not create placeholder issues; populate issueId only when implementation work is actually being started.",
   "- Set linear.planCommentPosted/progressCommentPosted/doneCommentPosted accurately.",
   "- Record test commands and results with exit codes.",
+  "- Ensure the PR body includes a closing statement in the form \"Fixes <ISSUE_ID>\" so Linear links the PR to the issue deterministically.",
   "- For completed issue runs, set changes.pullRequestUrl to the opened/updated PR URL.",
   "- Do not set status=done unless tests are green and verification steps are present.",
   "",

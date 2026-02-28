@@ -86,7 +86,7 @@ test("issue-run unscoped instructions include PR lifecycle requirements", () => 
     const instructions = readFileSync(instructionsPath, "utf8");
     assert.match(
       instructions,
-      /8\. PR lifecycle: open or update a PR for the issue branch and record the PR URL in run\.json changes\.pullRequestUrl\./
+      /8\. PR lifecycle: open or update a PR for the issue branch, include "Fixes <ISSUE_ID>" in the PR body for Linear linking, and record the PR URL in run\.json changes\.pullRequestUrl\./
     );
     assert.match(
       instructions,
@@ -113,7 +113,7 @@ test("issue-run issue-bound instructions include PR lifecycle requirements", () 
     const instructions = readFileSync(instructionsPath, "utf8");
     assert.match(
       instructions,
-      /6\. PR lifecycle: open or update a PR for the issue branch and record the PR URL in run\.json changes\.pullRequestUrl\./
+      /6\. PR lifecycle: open or update a PR for the issue branch, include "Fixes BRI-39" in the PR body for Linear linking, and record the PR URL in run\.json changes\.pullRequestUrl\./
     );
     assert.match(
       instructions,
