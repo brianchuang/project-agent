@@ -1,9 +1,10 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createInitialRunArtifact } from "../src/workflowArtifacts";
 import { loadProjectConfig, resolveProjectNamespace } from "../src/projectConfig";
-import { ensureIssueWorktreeAndMaybeRelaunch } from "../src/worktree";
+import { UNSCOPED_WORKTREE_KEY_ENV, ensureIssueWorktreeAndMaybeRelaunch, unscopedWorktreeKey } from "../src/worktree";
 
 function usage(): never {
   console.error("Usage: project-agent [ISSUE_ID] [--artifacts-dir <path>] [--no-codex]");
@@ -49,6 +50,9 @@ function resolveArtifactsRoot(): string {
 }
 
 const root = process.cwd();
+if (!issueId && !process.env[UNSCOPED_WORKTREE_KEY_ENV]) {
+  process.env[UNSCOPED_WORKTREE_KEY_ENV] = unscopedWorktreeKey(randomUUID());
+}
 const worktreeBootstrap = ensureIssueWorktreeAndMaybeRelaunch({
   cwd: root,
   issueId
@@ -76,7 +80,8 @@ if (worktreeBootstrap.action === "already-in-target") {
 }
 const effectiveRoot = process.cwd();
 const loadedConfig = loadProjectConfig(effectiveRoot);
-const runKey = issueId || `UNSCOPED-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+const unscopedRunKey = process.env[UNSCOPED_WORKTREE_KEY_ENV] || `unscoped-${randomUUID()}`;
+const runKey = issueId || unscopedRunKey.toUpperCase();
 const artifactDir = join(
   resolveArtifactsRoot(),
   resolveProjectNamespace(effectiveRoot, loadedConfig?.config ?? null),

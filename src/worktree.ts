@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const DISABLE_WORKTREE_ENV = "PROJECT_AGENT_DISABLE_WORKTREE";
+export const UNSCOPED_WORKTREE_KEY_ENV = "PROJECT_AGENT_UNSCOPED_WORKTREE_KEY";
 const WORKTREE_DIRNAME = ".project-agent-worktrees";
 
 export type WorktreeSpec = {
@@ -24,14 +25,17 @@ export function sanitizeWorktreeKey(value: string): string {
   return cleaned || "run";
 }
 
-export function unscopedWorktreeKey(nowIso: string, pid: number): string {
-  const ts = nowIso.replace(/[:.]/g, "-").toLowerCase();
-  return sanitizeWorktreeKey(`unscoped-${ts}-p${pid}`);
+export function unscopedWorktreeKey(sessionId: string): string {
+  return sanitizeWorktreeKey(`unscoped-${sessionId}`);
 }
 
-export function resolveWorktreeSpec(issueId: string, nowIso: string, pid: number): WorktreeSpec {
+export function resolveWorktreeSpec(issueId: string, unscopedKey?: string): WorktreeSpec {
   const trimmed = issueId.trim();
-  const key = trimmed ? sanitizeWorktreeKey(trimmed) : unscopedWorktreeKey(nowIso, pid);
+  const unscopedTrimmed = (unscopedKey || "").trim();
+  if (!trimmed && !unscopedTrimmed) {
+    throw new Error("resolveWorktreeSpec requires issueId or unscopedKey.");
+  }
+  const key = trimmed ? sanitizeWorktreeKey(trimmed) : sanitizeWorktreeKey(unscopedTrimmed);
   return {
     key,
     branch: trimmed ? key : `project-agent-${key}`
@@ -53,7 +57,11 @@ export function ensureIssueWorktreeAndMaybeRelaunch(args: {
     return { action: "skipped", reason: "not inside a git worktree" };
   }
 
-  const spec = resolveWorktreeSpec(args.issueId, args.nowIso ?? new Date().toISOString(), args.pid ?? process.pid);
+  const fallbackSeed = `${args.nowIso ?? new Date().toISOString()}-p${args.pid ?? process.pid}`;
+  const spec = resolveWorktreeSpec(
+    args.issueId,
+    process.env[UNSCOPED_WORKTREE_KEY_ENV] || unscopedWorktreeKey(fallbackSeed)
+  );
   const targetPath = join(gitRoot, WORKTREE_DIRNAME, spec.key);
   if (samePath(args.cwd, targetPath)) {
     return { action: "already-in-target", path: targetPath, branch: spec.branch };

@@ -48,6 +48,8 @@ bin/start-run AG-123
 bin/issue-run AG-123
 ```
 
+`run.json` is versioned (`version` field) and `validate-run` enforces supported schema versions.
+
 Or start from free-form intake (no issue provided yet):
 
 ```bash
@@ -56,14 +58,12 @@ project-agent
 
 In free-form mode, Codex must triage first, then bind the run to an existing or newly-created Linear issue by setting `run.json.issueId` before coding.
 
-`run.json` is versioned (`version` field) and `validate-run` enforces supported schema versions.
-
 By default this creates files under:
 
 - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/run.json`
 - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/codex-instructions.md`
 
-Where `<RUN_KEY>` is the issue ID when provided, or an `UNSCOPED-<timestamp>` key for free-form intake.
+Where `<RUN_KEY>` is the issue ID when provided, or an `UNSCOPED-<SESSION_ID>` key for free-form intake.
 
 Optional override:
 
