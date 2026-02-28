@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createInitialRunArtifact } from "../src/workflowArtifacts";
 import { loadProjectConfig, resolveProjectNamespace } from "../src/projectConfig";
-import { ensureIssueWorktreeAndMaybeRelaunch, worktreeBootstrapGuardEnv } from "../src/worktree";
+import { ensureIssueWorktreeAndMaybeRelaunch } from "../src/worktree";
 
 function usage(): never {
   console.error("Usage: project-agent [ISSUE_ID] [--artifacts-dir <path>] [--no-codex]");
@@ -59,11 +59,7 @@ if (worktreeBootstrap.action === "relaunch") {
   const relaunchArgs = [...process.execArgv, process.argv[1], ...process.argv.slice(2)];
   const relaunch = spawnSync(process.execPath, relaunchArgs, {
     cwd: worktreeBootstrap.path,
-    stdio: "inherit",
-    env: {
-      ...process.env,
-      [worktreeBootstrapGuardEnv()]: "1"
-    }
+    stdio: "inherit"
   });
   if (relaunch.error) {
     const code = (relaunch.error as NodeJS.ErrnoException).code;
@@ -129,14 +125,14 @@ const instructions = [
     ? "5. Verify: run tests and collect concrete evidence."
     : "5. Plan: post a plan comment to that issue before editing code.",
   issueId
-    ? "6. Document: post progress + done comments with summary, tests, verification."
-    : "6. Implement: make focused code changes against acceptance criteria.",
+    ? "6. Open or update a PR for the issue branch and capture the PR URL in run.json changes.pullRequestUrl."
+    : "6. Verify: run tests and collect concrete evidence.",
   issueId
-    ? "7. Transition: mark issue done only after evidence is posted."
-    : "7. Verify: run tests and collect concrete evidence.",
+    ? "7. Document: post progress + done comments with summary, tests, verification, and PR details."
+    : "7. Document: post progress + done comments with summary, tests, verification.",
   issueId
-    ? ""
-    : "8. Document: post progress + done comments with summary, tests, verification.",
+    ? "8. Transition: mark issue done only after evidence is posted."
+    : "",
   issueId
     ? ""
     : "9. Transition: mark issue done only after evidence is posted.",
@@ -146,6 +142,7 @@ const instructions = [
   "- If run started without issueId, do not create placeholder issues; populate issueId only when implementation work is actually being started.",
   "- Set linear.planCommentPosted/progressCommentPosted/doneCommentPosted accurately.",
   "- Record test commands and results with exit codes.",
+  "- For completed issue runs, set changes.pullRequestUrl to the opened/updated PR URL.",
   "- Do not set status=done unless tests are green and verification steps are present.",
   "",
   "Finish gate:",
