@@ -34,7 +34,7 @@ export function resolveWorktreeSpec(issueId: string, nowIso: string, pid: number
   const key = trimmed ? sanitizeWorktreeKey(trimmed) : unscopedWorktreeKey(nowIso, pid);
   return {
     key,
-    branch: `project-agent-${key}`
+    branch: trimmed ? key : `project-agent-${key}`
   };
 }
 
