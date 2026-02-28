@@ -2,7 +2,6 @@ import { existsSync, mkdirSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
-const BOOTSTRAP_GUARD_ENV = "PROJECT_AGENT_WORKTREE_BOOTSTRAPPED";
 const DISABLE_WORKTREE_ENV = "PROJECT_AGENT_DISABLE_WORKTREE";
 const WORKTREE_DIRNAME = ".project-agent-worktrees";
 
@@ -48,9 +47,6 @@ export function ensureIssueWorktreeAndMaybeRelaunch(args: {
   if (process.env[DISABLE_WORKTREE_ENV] === "1") {
     return { action: "skipped", reason: `${DISABLE_WORKTREE_ENV}=1` };
   }
-  if (process.env[BOOTSTRAP_GUARD_ENV] === "1") {
-    return { action: "skipped", reason: `${BOOTSTRAP_GUARD_ENV}=1` };
-  }
 
   const gitRoot = gitTopLevel(args.cwd);
   if (!gitRoot) {
@@ -65,10 +61,6 @@ export function ensureIssueWorktreeAndMaybeRelaunch(args: {
 
   const created = ensureWorktreeExists(gitRoot, targetPath, spec.branch);
   return { action: "relaunch", path: targetPath, branch: spec.branch, created };
-}
-
-export function worktreeBootstrapGuardEnv(): string {
-  return BOOTSTRAP_GUARD_ENV;
 }
 
 function ensureWorktreeExists(gitRoot: string, targetPath: string, branch: string): boolean {
@@ -93,17 +85,33 @@ function ensureWorktreeExists(gitRoot: string, targetPath: string, branch: strin
 }
 
 function gitTopLevel(cwd: string): string | null {
-  const result = spawnSync("git", ["rev-parse", "--show-toplevel"], { cwd, encoding: "utf8" });
-  if (result.status !== 0) {
+  const topLevel = gitOutput(cwd, ["rev-parse", "--show-toplevel"]);
+  if (!topLevel) {
     return null;
   }
-  const root = result.stdout.trim();
-  return root ? root : null;
+  const commonDir = gitOutput(cwd, ["rev-parse", "--path-format=absolute", "--git-common-dir"]);
+  if (!commonDir) {
+    return topLevel;
+  }
+  const normalized = commonDir.replace(/\\/g, "/");
+  if (normalized.endsWith("/.git")) {
+    return dirname(commonDir);
+  }
+  return topLevel;
 }
 
 function gitSuccess(cwd: string, args: string[]): boolean {
   const result = spawnSync("git", args, { cwd });
   return result.status === 0;
+}
+
+function gitOutput(cwd: string, args: string[]): string | null {
+  const result = spawnSync("git", args, { cwd, encoding: "utf8" });
+  if (result.status !== 0) {
+    return null;
+  }
+  const output = result.stdout.trim();
+  return output || null;
 }
 
 function samePath(a: string, b: string): boolean {
