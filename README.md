@@ -10,6 +10,15 @@ Codex is expected to use Linear via MCP tools during the run.
 - Node.js `>=22`
 - Codex environment with Linear MCP access
 
+## Repo Setup
+
+Add agent-managed runtime directories to `.gitignore` in any repository where you use this wrapper:
+
+```gitignore
+.project-agent-worktrees/
+.project-agent-artifacts/
+```
+
 ## Core Idea
 
 For each issue run, enforce a reproducible loop:
