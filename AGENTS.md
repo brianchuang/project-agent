@@ -35,8 +35,8 @@ For every implementation run tied to a Linear issue:
 ## Deterministic Artifact Gate
 
 Each issue run must maintain:
-- `~/.project-agent-artifacts/<repo>-<hash>/<ISSUE_ID>/run.json` (default path)
-- `~/.project-agent-artifacts/<repo>-<hash>/<ISSUE_ID>/codex-instructions.md`
+- `<cwd>/.project-agent-artifacts/<repo>-<hash>/<ISSUE_ID>/run.json` (default path)
+- `<cwd>/.project-agent-artifacts/<repo>-<hash>/<ISSUE_ID>/codex-instructions.md`
 
 A run may be considered complete only when:
 - `run.json` has `status="done"`

@@ -58,8 +58,8 @@ In free-form mode, Codex must triage first, then bind the run to an existing or 
 
 By default this creates files under:
 
-- `~/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/run.json`
-- `~/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/codex-instructions.md`
+- `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/run.json`
+- `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/codex-instructions.md`
 
 Where `<RUN_KEY>` is the issue ID when provided, or an `UNSCOPED-<timestamp>` key for free-form intake.
 
@@ -107,7 +107,7 @@ PROJECT_AGENT_NO_CODEX=1 project-agent
 Validate completion gate:
 
 ```bash
-npm run validate-run -- ~/.project-agent-artifacts/<repo>-<hash>/AG-123/run.json
+npm run validate-run -- <cwd>/.project-agent-artifacts/<repo>-<hash>/AG-123/run.json
 ```
 
 A run is complete only when validation passes.

@@ -1,5 +1,4 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createInitialRunArtifact } from "../src/workflowArtifacts";
@@ -46,7 +45,7 @@ function resolveArtifactsRoot(): string {
   if (process.env.PROJECT_AGENT_ARTIFACTS_DIR?.trim()) {
     return process.env.PROJECT_AGENT_ARTIFACTS_DIR.trim();
   }
-  return join(homedir(), ".project-agent-artifacts");
+  return join(process.cwd(), ".project-agent-artifacts");
 }
 
 const root = process.cwd();

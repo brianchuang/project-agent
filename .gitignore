@@ -2,6 +2,5 @@ node_modules/
 .project-agent-worktrees/
 
 # Keep repository CLI scripts in /bin tracked.
-bin/
 
 .DS_Store
