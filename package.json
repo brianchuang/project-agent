@@ -1,0 +1,20 @@
+{
+  "name": "project-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "project-agent": "bin/project-agent"
+  },
+  "scripts": {
+    "start-run": "node --import tsx scripts/issue-run.ts",
+    "issue-run": "node --import tsx scripts/issue-run.ts",
+    "validate-run": "node --import tsx scripts/validate-run.ts",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
