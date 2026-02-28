@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createInitialRunArtifact } from "../src/workflowArtifacts";
 import { loadProjectConfig, resolveProjectNamespace } from "../src/projectConfig";
+import { ensureIssueWorktreeAndMaybeRelaunch, worktreeBootstrapGuardEnv } from "../src/worktree";
 
 function usage(): never {
   console.error("Usage: project-agent [ISSUE_ID] [--artifacts-dir <path>] [--no-codex]");
@@ -49,11 +50,41 @@ function resolveArtifactsRoot(): string {
 }
 
 const root = process.cwd();
-const loadedConfig = loadProjectConfig(root);
+const worktreeBootstrap = ensureIssueWorktreeAndMaybeRelaunch({
+  cwd: root,
+  issueId
+});
+if (worktreeBootstrap.action === "relaunch") {
+  console.log(`${worktreeBootstrap.created ? "Created" : "Reusing"} worktree ${worktreeBootstrap.path} (${worktreeBootstrap.branch}).`);
+  const relaunchArgs = [...process.execArgv, process.argv[1], ...process.argv.slice(2)];
+  const relaunch = spawnSync(process.execPath, relaunchArgs, {
+    cwd: worktreeBootstrap.path,
+    stdio: "inherit",
+    env: {
+      ...process.env,
+      [worktreeBootstrapGuardEnv()]: "1"
+    }
+  });
+  if (relaunch.error) {
+    const code = (relaunch.error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") {
+      console.error("Failed to relaunch in worktree: node executable was not found.");
+    } else {
+      console.error(`Failed to relaunch in worktree: ${relaunch.error.message}`);
+    }
+    process.exit(1);
+  }
+  process.exit(typeof relaunch.status === "number" ? relaunch.status : 1);
+}
+if (worktreeBootstrap.action === "already-in-target") {
+  console.log(`Using managed worktree ${worktreeBootstrap.path} (${worktreeBootstrap.branch}).`);
+}
+const effectiveRoot = process.cwd();
+const loadedConfig = loadProjectConfig(effectiveRoot);
 const runKey = issueId || `UNSCOPED-${new Date().toISOString().replace(/[:.]/g, "-")}`;
 const artifactDir = join(
   resolveArtifactsRoot(),
-  resolveProjectNamespace(root, loadedConfig?.config ?? null),
+  resolveProjectNamespace(effectiveRoot, loadedConfig?.config ?? null),
   runKey
 );
 const runPath = join(artifactDir, "run.json");
@@ -71,7 +102,7 @@ try {
 const instructions = [
   `# Codex Run Contract: ${issueId || "No issue provided"}`,
   "",
-  `Repository root: ${root}`,
+  `Repository root: ${effectiveRoot}`,
   "",
   "Linear is the source of truth. Use Linear MCP tools for all issue actions.",
   loadedConfig
@@ -143,7 +174,7 @@ const initialPromptLines = [
     ? `Issue ID for this run: ${issueId}`
     : "No issue ID provided yet; wait for the first concrete user request before intake triage. Do not create placeholder issues, and only bind run.json when implementation scope is confirmed."
 ];
-const launch = spawnSync("codex", [initialPromptLines.join("\n")], { cwd: root, stdio: "inherit" });
+const launch = spawnSync("codex", [initialPromptLines.join("\n")], { cwd: effectiveRoot, stdio: "inherit" });
 if (launch.error) {
   const code = (launch.error as NodeJS.ErrnoException).code;
   if (code === "ENOENT") {
@@ -151,7 +182,7 @@ if (launch.error) {
   } else {
     console.error(`Failed to launch Codex: ${launch.error.message}`);
   }
-  console.error(`Run Codex manually from ${root} and follow ${instructionsPath}.`);
+  console.error(`Run Codex manually from ${effectiveRoot} and follow ${instructionsPath}.`);
   process.exit(1);
 }
 if (typeof launch.status === "number") {
