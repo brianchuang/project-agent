@@ -11,20 +11,24 @@ For every implementation run tied to a Linear issue:
 - Use Linear MCP to load the issue and comments.
 - If acceptance criteria are missing or ambiguous, post clarification questions in Linear and stop.
 
-2. Plan before code
+2. Align branch with Linear
+- Read the issue `gitBranchName` from Linear and switch/create that branch before editing files.
+- Do not implement from unscoped branches once an issue is bound.
+
+3. Plan before code
 - Post a concrete implementation plan comment to the issue before editing files.
 - Set `run.json` field `linear.planCommentPosted=true`.
 
-3. Implement against plan
+4. Implement against plan
 - Make minimal, scoped changes that satisfy acceptance criteria.
 - Keep progress visible: post at least one progress update in Linear.
 - Set `linear.progressCommentPosted=true`.
 
-4. Verify with evidence
+5. Verify with evidence
 - Run relevant tests.
 - Record each test command and exit code in `run.json` under `tests`.
 
-5. Document and transition
+6. Document and transition
 - Post done comment in Linear with:
   - summary of what changed
   - tests executed and results
