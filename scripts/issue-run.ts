@@ -89,8 +89,13 @@ const artifactDir = join(
 );
 const runPath = join(artifactDir, "run.json");
 const instructionsPath = join(artifactDir, "codex-instructions.md");
+const skillsDir = join(artifactDir, "skills");
+const skillsManifestPath = join(skillsDir, "skills.json");
+const linearSkillPath = join(skillsDir, "linear.md");
+const githubSkillPath = join(skillsDir, "github.md");
 
 mkdirSync(artifactDir, { recursive: true });
+mkdirSync(skillsDir, { recursive: true });
 
 const initial = createInitialRunArtifact(issueId);
 try {
@@ -123,6 +128,71 @@ const requiredSequence = issueId
       "10. Transition: mark issue done only after evidence is posted."
     ];
 
+const linearSkill = [
+  "---",
+  "name: linear-workflow",
+  "description: Run-scoped Linear workflow rules for intake, planning, progress/done comments, and state transitions.",
+  "---",
+  "",
+  "# Run Skill: Linear Workflow",
+  "",
+  "Use this run-local skill whenever work touches issue intake, planning, progress updates, done comments, or issue state transitions.",
+  "",
+  "Rules:",
+  "- Linear is authoritative for issue status, acceptance criteria, and completion evidence.",
+  "- For free-form intake, search existing issues before creating a new one.",
+  "- Before coding, bind run.json issueId and align to issue gitBranchName.",
+  "- Post a concrete plan comment before edits, then post at least one progress comment during implementation.",
+  "- Post a done comment that includes summary, test evidence, manual verification, and PR URL.",
+  "- Transition the issue state only after evidence is posted."
+].join("\n");
+
+const githubSkill = [
+  "---",
+  "name: github-pr-workflow",
+  "description: Run-scoped GitHub workflow rules for issue-scoped commits, PR updates, and PR evidence capture.",
+  "---",
+  "",
+  "# Run Skill: GitHub PR Workflow",
+  "",
+  "Use this run-local skill whenever work reaches code verification and review handoff.",
+  "",
+  "Rules:",
+  "- Keep commits scoped to the bound issue and avoid unrelated file changes.",
+  "- Open or update a PR from the issue branch.",
+  "- Record the PR URL in run.json at changes.pullRequestUrl.",
+  "- Include tests executed and manual verification steps in the PR-ready summary.",
+  "- Do not mark the run done until tests are green and the done comment includes PR details."
+].join("\n");
+
+writeFileSync(linearSkillPath, `${linearSkill}\n`, "utf8");
+writeFileSync(githubSkillPath, `${githubSkill}\n`, "utf8");
+writeFileSync(
+  skillsManifestPath,
+  `${JSON.stringify(
+    {
+      version: 1,
+      skills: [
+        {
+          name: "linear-workflow",
+          description:
+            "Run-scoped Linear workflow rules for intake, planning, progress/done comments, and state transitions.",
+          path: linearSkillPath
+        },
+        {
+          name: "github-pr-workflow",
+          description:
+            "Run-scoped GitHub workflow rules for issue-scoped commits, PR updates, and PR evidence capture.",
+          path: githubSkillPath
+        }
+      ]
+    },
+    null,
+    2
+  )}\n`,
+  "utf8"
+);
+
 const instructions = [
   `# Codex Run Contract: ${issueId || "No issue provided"}`,
   "",
@@ -147,6 +217,12 @@ const instructions = [
   "- For completed issue runs, set changes.pullRequestUrl to the opened/updated PR URL.",
   "- Do not set status=done unless tests are green and verification steps are present.",
   "",
+  "Run-local skills:",
+  `- Linear workflow: ${linearSkillPath}`,
+  `- GitHub workflow: ${githubSkillPath}`,
+  `- Skill manifest (names + metadata): ${skillsManifestPath}`,
+  "- Prefer skill selection by metadata description, then load and apply only the relevant file(s).",
+  "",
   "Finish gate:",
   `- Run: npm run validate-run -- ${runPath}`,
   "- A run is complete only when validation passes."
@@ -157,6 +233,7 @@ writeFileSync(instructionsPath, `${instructions}\n`, "utf8");
 console.log(`Prepared run context for ${issueId || "unscoped intake"}.`);
 console.log(`- Artifact: ${runPath}`);
 console.log(`- Instructions: ${instructionsPath}`);
+console.log(`- Skills dir: ${skillsDir}`);
 if (loadedConfig) {
   console.log(`- Project config: ${loadedConfig.path}`);
 }
