@@ -72,6 +72,9 @@ By default this creates files under:
 
 - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/run.json`
 - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/codex-instructions.md`
+- `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/skills/linear.md`
+- `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/skills/github.md`
+- `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/skills/skills.json`
 
 Where `<RUN_KEY>` is the issue ID when provided, or an `UNSCOPED-<SESSION_ID>` key for free-form intake.
 
@@ -107,6 +110,8 @@ If found, it uses the config to define project identity:
 - If config is invalid, the CLI exits with a clear file-path-specific validation error.
 
 Then run Codex in this repository and follow `codex-instructions.md`.
+`codex-instructions.md` links run-local skill files plus a manifest (`skills/skills.json`) containing skill names and descriptions.
+Each skill markdown file includes metadata with a `description` field so agents can select skills using existing metadata-driven behavior.
 
 By default, `project-agent` now launches `codex` automatically after preparing artifacts, with an initial prompt that points Codex at the generated `codex-instructions.md` and default Linear project scope from config.
 Use `--no-codex` (or `PROJECT_AGENT_NO_CODEX=1`) when you only want artifact preparation:
