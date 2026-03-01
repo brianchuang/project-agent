@@ -16,6 +16,9 @@ Linear is handled through Codex MCP tools, and `run.json` is the deterministic l
 - `project-agent [ISSUE_ID]` creates:
   - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/run.json`
   - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/codex-instructions.md`
+  - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/skills/linear.md`
+  - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/skills/github.md`
+  - `<cwd>/.project-agent-artifacts/<repo>-<hash>/<RUN_KEY>/skills/skills.json`
 - If no issue ID is provided, the run starts as intake and Codex triages to reuse/create an issue, then updates `run.json.issueId` before implementation.
 - `start-run` and `issue-run` remain as backward-compatible aliases.
 
